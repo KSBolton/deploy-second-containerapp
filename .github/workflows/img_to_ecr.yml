@@ -33,7 +33,7 @@ jobs:
         ECR_APP_REPO: clo835-a1-webapp
         ECR_DB_REPO: clo835-a1-mysqldb
         DB_PWD: ${{ secrets.DB_PWD }}
-        IMAGE_TAG: ${{ github.sha }}
+        IMAGE_TAG: latest
       run: |
         docker build -t $ECR_REGISTRY/$ECR_APP_REPO:$IMAGE_TAG .
         docker build -t $ECR_REGISTRY/$ECR_DB_REPO:$IMAGE_TAG -f Dockerfile_mysql .
