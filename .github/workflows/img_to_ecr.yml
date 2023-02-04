@@ -34,7 +34,7 @@ jobs:
         ECR_DB_REPO: clo835-a1-mysqldb
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECP_APP_REPO:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_APP_REPO:$IMAGE_TAG .
         docker build -t $ECR_REGISTRY/$ECR_DB_REPO:$IMAGE_TAG -f Dockerfile_mysql .
         # Make custom bridge network
         docker network create -d bridge assign1
