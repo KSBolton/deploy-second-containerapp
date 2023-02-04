@@ -30,14 +30,21 @@ jobs:
     - name: Build, test, tag, and push image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: clo835-assignment1
+        ECR_APP_REPO: clo835-a1-webapp
+        ECR_DB_REPO: clo835-a1-mysqldb
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECP_APP_REPO:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_DB_REPO:$IMAGE_TAG -f Dockerfile_mysql .
+        # Make custom bridge network
+        docker network create -d bridge assign1
         # Unit test
-        docker run -d -p 80:8080 --name nodeapp $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker run --name mysql-db -d -e MYSQL_ROOT_PASSWORD="db_pass123" --network asign1  mysql-db
+        # Wait for sql container to listen on port
+        sleep 15
+        docker run -itd -p 80:8080 -e DBHOST="mysql-db" -e DBPORT="3306" -e APP_COLOR="blue" \
+        -e DBPWD="db_pass123" --net assign1 --name webapp webapp
         docker ps
-        echo "Pause for 10 seconds to let container start"
-        sleep 10
         curl localhost -vvv
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_APP_REPO:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_DB_REPO:$IMAGE_TAG
