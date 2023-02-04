@@ -47,6 +47,7 @@ jobs:
         docker run -itd -p 80:8080 -e DBHOST="mysql-db" -e DBPORT="3306" -e APP_COLOR="blue" \
         -e DBPWD=$DB_PWD --net assign1 --name webapp $ECR_REGISTRY/$ECR_APP_REPO:$IMAGE_TAG
         docker ps
+        sleep 5
         curl localhost -vvv
         docker push $ECR_REGISTRY/$ECR_APP_REPO:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_DB_REPO:$IMAGE_TAG
