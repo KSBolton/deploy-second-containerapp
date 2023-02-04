@@ -32,6 +32,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_APP_REPO: clo835-a1-webapp
         ECR_DB_REPO: clo835-a1-mysqldb
+        DB_PWD: ${{ secrets.DB_PWD }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_APP_REPO:$IMAGE_TAG .
@@ -39,11 +40,12 @@ jobs:
         # Make custom bridge network
         docker network create -d bridge assign1
         # Unit test
-        docker run --name mysql-db -d -e MYSQL_ROOT_PASSWORD="db_pass123" --network asign1  mysql-db
+        docker run --name mysql-db -d -e MYSQL_ROOT_PASSWORD=$DB_PWD --network assign1  \
+        $ECR_REGISTRY/$ECR_DB_REPO:$IMAGE_TAG
         # Wait for sql container to listen on port
         sleep 15
         docker run -itd -p 80:8080 -e DBHOST="mysql-db" -e DBPORT="3306" -e APP_COLOR="blue" \
-        -e DBPWD="db_pass123" --net assign1 --name webapp webapp
+        -e DBPWD=$DB_PWD --net assign1 --name webapp $ECR_REGISTRY/$ECR_APP_REPO:$IMAGE_TAG
         docker ps
         curl localhost -vvv
         docker push $ECR_REGISTRY/$ECR_APP_REPO:$IMAGE_TAG
