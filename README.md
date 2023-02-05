@@ -1,41 +1,20 @@
-# Install the required MySQL package
+# Introduction
 
-sudo apt-get update -y
-sudo apt-get install mysql-client -y
+This project is an introduction to running containerized applications in AWS, and using Elastic Container Registry (ECR) as the public source of truth for images.
+In its current state, the project:
 
-# Running application locally
-pip3 install -r requirements.txt
-sudo python3 app.py
-# Building and running 2 tier web application locally
-### Building mysql docker image 
-```docker build -t my_db -f Dockerfile_mysql . ```
-
-### Building application docker image 
-```docker build -t my_app -f Dockerfile . ```
-
-### Running mysql
-```docker run -d -e MYSQL_ROOT_PASSWORD=pw  my_db```
+1. Builds the AWS infrastructure (Networking, EC2, ECR, ALB) via Terraform.
+1. Builds and pushes the images to ECR via GitHub Actions.
+1. Manually (for now!) connects to the EC2 host to pull images from ECR and run the containers.
 
 
-### Get the IP of the database and export it as DBHOST variable
-```docker inspect <container_id>```
-
-
-### Example when running DB runs as a docker container and app is running locally
-```
-export DBHOST=127.0.0.1
-export DBPORT=3307
-```
-### Example when running DB runs as a docker container and app is running locally
-```
-export DBHOST=172.17.0.2
-export DBPORT=3306
-```
-```
-export DBUSER=root
-export DATABASE=employees
-export DBPWD=pw
-export APP_COLOR=blue
-```
-### Run the application, make sure it is visible in the browser
-```docker run -p 8080:8080  -e DBHOST=$DBHOST -e DBPORT=$DBPORT -e  DBUSER=$DBUSER -e DBPWD=$DBPWD  my_app```
+# Steps (fairly simple)
+1. Generate an SSH key pair for the EC2 instance (I named mine 'key' because I'm very imaginative.) The name is hardcode in TF so change it there, as needed.
+1. Run the Terraform code to build the underlying infrastructure on AWS. Docker should be installed on the EC2.
+1. At EC2 CLI:
+    - Login to ECR (aws ecr get-login-password --region <region> | docker login -u AWS <ECR URI> --password-stdin
+    - Create a custom bridge network to allow name resolution among containers.
+    - Run the mysqldb container first - it may need a couple seconds to listen on its ports.
+    - Run as many webapp containers as you wish, so long as they use these environment variables:
+        - DBHOST (the DB container), DBPORT (usually 3306), APP_COLOR, DBPWD
+1. The Terraform code returns the repositories' URL, the IP address of the EC2 instance, and the FQDN of the ALB.        
