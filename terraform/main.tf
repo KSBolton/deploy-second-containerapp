@@ -7,6 +7,17 @@ module "ecr" {
   default_tags = module.globalvars.default_tags
 }
 
+module "alb" {
+  source       = "./modules/alb"
+  secgrp_id    = module.infra.lb_http_secgrp
+  subnet_id    = module.infra.public_subnet
+  prefix       = module.globalvars.prefix
+  default_tags = module.globalvars.default_tags
+  env          = var.env
+  vpc_id       = module.infra.vpc_id
+  color_svr_id = module.infra.aws_instance_id
+}
+
 module "infra" {
   source          = "./modules/infra"
   env             = var.env
