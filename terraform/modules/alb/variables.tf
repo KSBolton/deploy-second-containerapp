@@ -27,6 +27,6 @@ variable "vpc_id" {
 }
 
 variable "color_svr_id" {
-  type = string
+  type        = string
   description = "EC2 instance ID for color server"
 }

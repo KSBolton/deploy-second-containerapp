@@ -14,7 +14,7 @@ resource "aws_lb_target_group" "blue_8081" {
 
   }
   vpc_id = var.vpc_id
-  
+
   tags = merge(var.default_tags,
     {
       Name = "${var.prefix}-blue-Target-Group"
@@ -38,7 +38,7 @@ resource "aws_lb_target_group" "pink_8082" {
 
   }
   vpc_id = var.vpc_id
-  
+
   tags = merge(var.default_tags,
     {
       Name = "${var.prefix}-pink-Target-Group"
@@ -62,7 +62,7 @@ resource "aws_lb_target_group" "lime_8083" {
 
   }
   vpc_id = var.vpc_id
-  
+
   tags = merge(var.default_tags,
     {
       Name = "${var.prefix}-lime-Target-Group"
